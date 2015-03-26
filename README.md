@@ -1,4 +1,4 @@
-#WORK IN PROGRESS#
+#THIS DESCRPTION IS A WORK IN PROGRESS AND SUBJECT TO CHANGE#
 ##Why this software
 ####VR Headset stabilization in a nutshell
 As described in [this picture](http://www.vectionvr.com/tobedefined), to simulate the acceleration of a car, a motion simulator would lean the player's seat backwards. This would be interpreted by the Oculus Rift as looking up. Our goal is to solve this problem by changing VR headset reference orientation according to the motion platform current orientation. This process is obviously only reliable if a fast and accurate motion platform orientation sensor is used.

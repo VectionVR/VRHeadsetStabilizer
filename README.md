@@ -9,7 +9,7 @@ Obviously we simplified the problem to ease the understanding but this problem i
 Our reference implementation is based on 3 elements:
 - Modification of the Oculus Rift library to receive and use real ground orientation in orientation detection algorithm. This is described and available [here](https://github.com/VectionVR/OculusRiftPatch)
 - Java based software that will grab platform orientation and send it to our modified Oculus Rift library with a **sub millisecond** latency. 
-- 800-1000Hz 9doF IMU providing high accuracy. Until now, the only affordable device with such high orientation detection rate we could find is from [YEI Technology](http://www.yeitechnology.com) 
+- 800-1000Hz 9doF IMU providing high accuracy. Until now, the only affordable device with such high orientation detection rate we could find is the 3 space sensor from [YEI Technology](http://www.yeitechnology.com/productdisplay/3-space-micro-usb) 
 
 ##How to build 
 - Grab the maven project from the [Stabilizer](https://github.com/VectionVR/VRHeadsetStabilizer/Stabilizer) project folder in this repository

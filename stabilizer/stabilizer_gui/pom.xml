@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2014 Bnome SPRL (info@bnome.be)
+
+    This file is part of VectionVR Stabilizer.
+
+    VectionVR Stabilizer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    VectionVR Stabilizer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with VectionVR Stabilizer.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.vectionvr</groupId>
+        <artifactId>stabilizer</artifactId>
+        <version>1.8-SNAPSHOT</version>
+    </parent>
+    <artifactId>stabilizer_gui</artifactId>
+    <packaging>jar</packaging>
+    <name>VectionVR Stabilizer</name>
+    <dependencies>
+        <dependency>
+            <groupId>org.python</groupId>
+            <artifactId>jython-standalone</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vectionvr</groupId>
+            <artifactId>stabilizer_lib</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-main</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-main</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <header>${basedir}/../HEADER</header>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.9.1</version>
+                <executions>
+                    <execution>
+                        <id>parse-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>assembly</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.vectionvr</groupId>
+                    <artifactId>stabilizer_lib</artifactId>
+                    <version>${project.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.scream3r</groupId>
+                    <artifactId>jssc</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpg-jdk15on</artifactId>
+                </dependency>                
+                <dependency>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.objectstyle.japp</groupId>
+                        <artifactId>japp-maven-plugin</artifactId>
+                        <version>3.0</version>
+                        <executions>
+                            <execution> 
+                                <id>java7</id> 
+                                <configuration> 
+                                    <excludes> 
+                                        <exclude>com.vectionvr:stabilizer_lib</exclude> 
+                                    </excludes> 
+                                    <destDir>${basedir}/target/mac</destDir> 
+                                    <name>VectionVR</name> 
+                                    <mainClass>com.vectionvr.jort.gui.GuiMain</mainClass> 
+                                    <icon>src/main/resources/datas/vectionok.icns</icon> 
+                                    <os>mac</os> 
+                                    <jvmOptions>-Xmx64m -Xdock:name=VectionVR -Dapple.laf.useScreenMenuBar=true</jvmOptions> 
+                                </configuration> 
+                                <phase>install</phase> 
+                                <goals> 
+                                    <goal>japp</goal> 
+                                </goals> 
+                            </execution> 
+                            <execution> 
+                                <id>java6</id> 
+                                <configuration> 
+                                    <excludes> 
+                                        <exclude>com.vectionvr:stabilizer_lib</exclude> 
+                                    </excludes> 
+                                    <destDir>${basedir}/target/mac-legacy</destDir> 
+                                    <name>VectionVR</name> 
+                                    <mainClass>com.vectionvr.jort.gui.GuiMain</mainClass> 
+                                    <icon>src/main/resources/datas/vectionok.icns</icon> 
+                                    <os>mac</os> 
+                                    <flavor>osx_legacy</flavor> 
+                                    <jvm>1.5+</jvm> 
+                                    <jvmOptions>-Xmx64m -Xdock:name=VectionVR -Dapple.laf.useScreenMenuBar=true</jvmOptions> 
+                                </configuration> 
+                                <phase>install</phase> 
+                                <goals> 
+                                    <goal>japp</goal> 
+                                </goals> 
+                            </execution> 
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.4.1</version>
+                        <executions>
+                            <execution>
+                                <id>build-generic-zip</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/linux-zip-assembly.xml</descriptor>
+                                    </descriptors>
+                                    <finalName>VectionVR (Generic)</finalName>
+                                    <archive>
+                                        <manifestEntries>
+                                            <SplashScreen-Image>vectionok.png</SplashScreen-Image>
+                                        </manifestEntries>
+                                        <manifest>
+                                            <mainClass>com.vectionvr.jort.gui.GuiMain</mainClass>
+                                        </manifest>
+                                    </archive>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                </configuration>
+                            </execution>
+                            <execution> 
+                                <id>build-mac-zip</id> 
+                                <phase>install</phase> 
+                                <goals> 
+                                    <goal>single</goal> 
+                                </goals> 
+                                <configuration> 
+                                    <outputDirectory>${basedir}/target</outputDirectory> 
+                                    <appendAssemblyId>false</appendAssemblyId> 
+                                    <finalName>VectionVR (Mac)</finalName> 
+                                    <descriptors> 
+                                        <descriptor>src/main/assembly/mac-zip-assembly.xml</descriptor> 
+                                    </descriptors> 
+                                </configuration> 
+                            </execution> 
+                            <execution> 
+                                <id>build-mac-generic-zip</id> 
+                                <phase>install</phase> 
+                                <goals> 
+                                    <goal>single</goal> 
+                                </goals> 
+                                <configuration> 
+                                    <outputDirectory>${basedir}/target</outputDirectory> 
+                                    <appendAssemblyId>false</appendAssemblyId> 
+                                    <finalName>VectionVR (Mac-legacy)</finalName> 
+                                    <descriptors> 
+                                        <descriptor>src/main/assembly/mac-legacy-zip-assembly.xml</descriptor> 
+                                    </descriptors> 
+                                </configuration> 
+                            </execution> 
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>appassembler-maven-plugin</artifactId>
+                        <version>1.9</version>
+                        <configuration>
+                            <programs>
+                                <program>
+                                    <mainClass>com.vectionvr.jort.gui.GuiMain</mainClass>
+                                    <id>VectionVR</id>
+                                </program>
+                            </programs>
+                            <repositoryName>libs</repositoryName>
+                            <repositoryLayout>flat</repositoryLayout>
+                            <assembleDirectory>${project.build.directory}/assembly</assembleDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>prepare-linux-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>assemble</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                        <artifactId>launch4j-maven-plugin</artifactId>
+                        <version>1.7.4</version>
+                        <executions>
+                            <execution>
+                                <id>l4j-clui</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>launch4j</goal>
+                                </goals>
+                                <configuration>
+                                    <headerType>gui</headerType>
+                                    <jar>libs/${project.artifactId}-${project.version}.jar</jar>
+                                    <dontWrapJar>true</dontWrapJar>
+                                    <outfile>target/assembly/VectionVR.exe</outfile>
+                                    <downloadUrl>http://java.com/download</downloadUrl>
+                                     									<chdir>../libs/</chdir> -->
+                                    <classPath>
+                                        <jarLocation>libs</jarLocation>
+                                         										<preCp>libs</preCp> -->
+                                        <addDependencies>true</addDependencies>
+                                        <mainClass>com.vectionvr.jort.gui.GuiMain</mainClass>
+                                    </classPath>
+                                    <icon>src/main/resources/datas/vectionok.ico</icon>
+                                    <jre>
+                                        <minVersion>1.6.0</minVersion>
+                                         <jdkPreference>preferJdk</jdkPreference> -->
+                                        <initialHeapSize>64</initialHeapSize>
+                                        <maxHeapSize>64</maxHeapSize>
+                                    </jre>
+                                    <splash>
+                                        <file>${basedir}/src/main/resources/imgs/logo.bmp</file>
+                                        <waitForWindow>true</waitForWindow>
+                                        <timeout>60</timeout>
+                                    </splash>
+                                    <versionInfo>
+                                        <fileVersion>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.0</fileVersion>
+                                        <txtFileVersion>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.0</txtFileVersion>
+                                        <fileDescription>${project.name}</fileDescription>
+                                        <copyright>2015 vectionvr.com</copyright>
+                                        <productVersion>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.0</productVersion>
+                                        <txtProductVersion>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.0</txtProductVersion>
+                                        <productName>${project.name}</productName>
+                                        <companyName>VectionVR</companyName>
+                                        <internalName>VectionVR</internalName>
+                                        <originalFilename>VectionVR.exe</originalFilename>
+                                    </versionInfo>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </reporting>
+    
+    <pluginRepositories>
+        <pluginRepository>
+            <id>objectstyle</id>
+            <name>ObjectStyle repository</name>
+            <url>http://maven.objectstyle.org/nexus/content/groups/cayenne-deps</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+</project>

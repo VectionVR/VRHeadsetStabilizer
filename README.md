@@ -12,13 +12,14 @@ Our reference implementation is based on 3 elements:
 - 800-1000Hz 9doF IMU providing high accuracy. Until now, the only affordable device with such high orientation detection rate we could find is the 3 space sensor from [YEI Technology](http://www.yeitechnology.com/productdisplay/3-space-micro-usb) 
 
 ##How to build 
-- Grab the maven project from the [Stabilizer](https://github.com/VectionVR/VRHeadsetStabilizer/Stabilizer) project folder in this repository
+- Clone this project locally
 ```
-git clone https://github.com/VectionVR/VRHeadsetStabilizer.git Stabilizer
+git clone https://github.com/VectionVR/VRHeadsetStabilizer.git VectionVRStabilizer
 ```
-- Import the project in you favorite Java IDE (We use [eclipse](http://www.eclipse.org) and [Netbeans](https://netbeans.org/downloads/) but any IDE supporting maven should be able to handle the project).
+- Import the project in stabilizer folder in you favorite Java IDE (We use [eclipse](http://www.eclipse.org) and [Netbeans](https://netbeans.org/downloads/) but any IDE supporting maven should be able to handle the project).
 - Build the project with assembly profile to generate platform dependant "executables" or directly launch the GuiMain class. 
 ```
+cd stabilizer
 mvn clean install -p assembly
 ```
 

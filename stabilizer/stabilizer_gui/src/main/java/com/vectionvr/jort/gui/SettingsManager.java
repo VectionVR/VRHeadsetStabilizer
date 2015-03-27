@@ -1,20 +1,7 @@
-/**
- * Copyright (C) 2014 Bnome SPRL (info@bnome.be)
- *
- * This file is part of VectionVR Stabilizer.
- *
- * VectionVR Stabilizer is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * VectionVR Stabilizer is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with VectionVR Stabilizer.  If not, see <http://www.gnu.org/licenses/>.
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package com.vectionvr.jort.gui;
 
@@ -32,12 +19,16 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * @author (Nicolas Chalon) n.chalon@bnome.be
+ *
+ * @author nico
  */
 class SettingsManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingsManager.class);
     private static final String DEFAULT = "_DEFAULT";
 
     static SettingsManager getSettingsManager(Object object) {
@@ -45,16 +36,12 @@ class SettingsManager {
     }
 
     private final Object object;
-    private final Preferences userPreferences;
-    private final List<Field> fields;
+    private Preferences userPreferences;
+    private List<Field> fields;
 
     public void reset() {
         for (Field field : fields) {
-            try {
-                resetFieldContent(field);
-            } catch (Exception e) {
-                userPreferences.remove(field.getName());
-            }
+            resetFieldContent(field);
         }
     }
 
@@ -62,32 +49,36 @@ class SettingsManager {
         this.object = object;
         this.fields = asList(object.getClass().getDeclaredFields());
         userPreferences = Preferences.userNodeForPackage(object.getClass());
-        extractFieldsContent();
-    }
-
-    private void extractFieldsContent() {
-        for (Field field : fields) {
-            try {
-                extractFieldContent(field);
-            } catch (Exception e) {
-                userPreferences.remove(field.getName());
-            }
+        try {
+            extractFieldsContent();
+        } catch (Exception ex) {
+            LOGGER.warn("Unable to retreive class data from preferences", ex);
         }
     }
 
-    private void extractFieldContent(Field field) throws Exception {
-        field.setAccessible(true);
-        final Object theField = field.get(object);
-        if (theField != null) {
-            if (theField.getClass().isAssignableFrom(JTextField.class)) {
-                handleTextField(field, ((JTextField) theField));
-            } else if (theField.getClass().isAssignableFrom(JFormattedTextField.class)) {
-                handleTextField(field, ((JTextField) theField));
-            } else if (theField.getClass().isAssignableFrom(JCheckBox.class)) {
-                handleCheckbox(field, ((JCheckBox) theField));
-            } else if (theField.getClass().isAssignableFrom(JComboBox.class)) {
-                handleComboBox(field, ((JComboBox) theField));
+    private void extractFieldsContent() throws Exception {
+        for (Field field : fields) {
+            extractFieldContent(field);
+        }
+    }
+
+    private void extractFieldContent(Field field) {
+        try {
+            field.setAccessible(true);
+            final Object theField = field.get(object);
+            if (theField != null) {
+                if (theField.getClass().isAssignableFrom(JTextField.class)) {
+                    handleTextField(field, ((JTextField) theField));
+                } else if (theField.getClass().isAssignableFrom(JFormattedTextField.class)) {
+                    handleTextField(field, ((JTextField) theField));
+                } else if (theField.getClass().isAssignableFrom(JCheckBox.class)) {
+                    handleCheckbox(field, ((JCheckBox) theField));
+                } else if (theField.getClass().isAssignableFrom(JComboBox.class)) {
+                    handleComboBox(field, ((JComboBox) theField));
+                }
             }
+        } catch (Exception ex) {
+            LOGGER.error("Unable to extract field content", ex);
         }
     }
 
@@ -138,20 +129,37 @@ class SettingsManager {
         });
     }
 
-    private void resetFieldContent(Field field) throws Exception {
-        field.setAccessible(true);
-        final Object theField = field.get(object);
-        if (theField != null) {
-            if (theField.getClass().isAssignableFrom(JTextField.class)) {
-                ((JTextField) theField).setText(userPreferences.get(field.getName() + DEFAULT, ""));
-            } else if (theField.getClass().isAssignableFrom(JFormattedTextField.class)) {
-                ((JTextField) theField).setText(userPreferences.get(field.getName() + DEFAULT, ""));
-            } else if (theField.getClass().isAssignableFrom(JCheckBox.class)) {
-                ((JCheckBox) theField).setSelected(userPreferences.getBoolean(field.getName() + DEFAULT, false));
-            } else if (theField.getClass().isAssignableFrom(JComboBox.class)) {
-                ((JComboBox) theField).setSelectedIndex(userPreferences.getInt(field.getName() + DEFAULT, 0));
+    private void resetFieldContent(Field field) {
+        try {
+            field.setAccessible(true);
+            final Object theField = field.get(object);
+            if (theField != null) {
+                if (theField.getClass().isAssignableFrom(JTextField.class)) {
+                    ((JTextField) theField).setText(userPreferences.get(field.getName() + DEFAULT, ""));
+                } else if (theField.getClass().isAssignableFrom(JFormattedTextField.class)) {
+                    ((JTextField) theField).setText(userPreferences.get(field.getName() + DEFAULT, ""));
+                } else if (theField.getClass().isAssignableFrom(JCheckBox.class)) {
+                    ((JCheckBox) theField).setSelected(userPreferences.getBoolean(field.getName() + DEFAULT, false));
+                } else if (theField.getClass().isAssignableFrom(JComboBox.class)) {
+                    ((JComboBox) theField).setSelectedIndex(userPreferences.getInt(field.getName() + DEFAULT, 0));
+                }
+                userPreferences.remove(field.getName());
             }
-            userPreferences.remove(field.getName());
+        } catch (Exception ex) {
+            LOGGER.error("Unable to reset field content", ex);
         }
     }
+
+    public void storeValue(String key, String value) {
+        userPreferences.put("_SPECIFIC_" + key, value);
+    }
+
+    public String getValue(String key) {
+        return userPreferences.get("_SPECIFIC_" + key, null);
+    }
+
+    public void deleteValue(String key) {
+        userPreferences.remove("_SPECIFIC_" + key);
+    }
+
 }

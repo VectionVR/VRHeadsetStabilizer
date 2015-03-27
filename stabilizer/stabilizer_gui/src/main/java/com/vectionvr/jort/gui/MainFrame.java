@@ -1,24 +1,8 @@
-/**
- * Copyright (C) 2014 Bnome SPRL (info@bnome.be)
- *
- * This file is part of VectionVR Stabilizer.
- *
- * VectionVR Stabilizer is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * VectionVR Stabilizer is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with VectionVR Stabilizer.  If not, see <http://www.gnu.org/licenses/>.
- */
 package com.vectionvr.jort.gui;
 
 import static com.vectionvr.jort.gui.SettingsManager.getSettingsManager;
+import static com.vectionvr.jort.serial.FilterMode.FAST;
+import static com.vectionvr.jort.serial.FilterMode.SLOW;
 import static java.lang.Integer.parseInt;
 import static java.lang.Math.abs;
 import static java.lang.Math.toDegrees;
@@ -28,6 +12,9 @@ import static javax.swing.SwingUtilities.invokeLater;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -48,17 +35,25 @@ import com.jogamp.opengl.util.FPSAnimator;
 import com.vectionvr.jort.data.SensorData;
 import com.vectionvr.jort.jogl.CameraViews;
 import com.vectionvr.jort.jogl.WorldScene;
+import static com.vectionvr.jort.license.LicenseManager.getLicenseManager;
 import com.vectionvr.jort.net.UDPSender;
+import com.vectionvr.jort.serial.FilterMode;
 import com.vectionvr.jort.serial.ImuOrientationDataStreamer;
 import com.vectionvr.jort.serial.SensorException;
+import com.vectionvr.jort.serial.SerialDeviceAnalyser;
 import com.vectionvr.jort.serial.StreamingSensorEventListener;
-import static java.awt.Desktop.getDesktop;
-import static java.awt.Desktop.isDesktopSupported;
-import static jssc.SerialPortList.getPortNames;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import java.awt.HeadlessException;
+import java.io.File;
+import javax.swing.JFileChooser;
+import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
+import static javax.swing.JOptionPane.OK_OPTION;
+import static javax.swing.JOptionPane.showMessageDialog;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
- * @author (Nicolas Chalon) n.chalon@bnome.be
+ *
+ * @author nico
  */
 public class MainFrame extends javax.swing.JFrame implements Runnable, StreamingSensorEventListener {
 
@@ -79,6 +74,9 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
     private float absMaxY = 0f;
     private float absMaxZ = 0f;
 
+    /**
+     * Creates new form MainFrame
+     */
     public MainFrame() {
         initComponents();
         setPortItems();
@@ -130,6 +128,9 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
         jLabel8 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        calibrateButton = new javax.swing.JButton();
+        gyroButton = new javax.swing.JButton();
         orientationPanel = new javax.swing.JPanel();
         tareButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
@@ -141,11 +142,11 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
         reverseY = new javax.swing.JCheckBox();
         reverseZ = new javax.swing.JCheckBox();
         refreshPortsButton = new javax.swing.JButton();
+        deviceLabel = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
         lockX1 = new javax.swing.JCheckBox();
         lockY1 = new javax.swing.JCheckBox();
         lockZ1 = new javax.swing.JCheckBox();
-        deviceChooser = new javax.swing.JComboBox();
         settingsButton = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jLabel14 = new javax.swing.JLabel();
@@ -163,6 +164,7 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
         jLabel18 = new javax.swing.JLabel();
         jLabelLink = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
+        userNameLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Vection-VR Stabilizer");
@@ -291,6 +293,44 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
                 .addContainerGap())
         );
 
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Calibration"));
+
+        calibrateButton.setText("A & C");
+        calibrateButton.setToolTipText("Calibrate acceleration & compass");
+        calibrateButton.setEnabled(false);
+        calibrateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                calibrateButtonActionPerformed(evt);
+            }
+        });
+
+        gyroButton.setText("Gyro");
+        gyroButton.setToolTipText("Calibrate gyroscope");
+        gyroButton.setEnabled(false);
+        gyroButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gyroButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(gyroButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(calibrateButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(calibrateButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(gyroButton))
+        );
+
         orientationPanel.setIgnoreRepaint(true);
         orientationPanel.setMinimumSize(new java.awt.Dimension(100, 83));
         orientationPanel.setPreferredSize(new java.awt.Dimension(100, 83));
@@ -330,6 +370,12 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
             }
         });
 
+        deviceLabel.setText("Device not connected");
+        deviceLabel.setMaximumSize(new java.awt.Dimension(141, 16));
+        deviceLabel.setMinimumSize(new java.awt.Dimension(141, 16));
+        deviceLabel.setOpaque(true);
+        deviceLabel.setPreferredSize(new java.awt.Dimension(141, 16));
+
         jLabel22.setText("Lock axis");
 
         lockX1.setText("X");
@@ -338,43 +384,42 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
 
         lockZ1.setText("Z");
 
-        deviceChooser.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "    -- No device --" }));
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
-                    .addComponent(jLabel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(direction, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addComponent(lockX1)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(lockY1)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(lockZ1))
-                                .addGroup(jPanel2Layout.createSequentialGroup()
-                                    .addComponent(reverseX)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(reverseY)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(reverseZ)))
+                            .addComponent(direction, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(deviceChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(lockX1)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lockY1)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lockZ1))
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(reverseX)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(reverseY)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(reverseZ)))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(deviceLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(refreshPortsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                                .addComponent(refreshPortsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addContainerGap())
+                    .addComponent(jLabel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -382,7 +427,7 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(refreshPortsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
-                    .addComponent(deviceChooser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(deviceLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
@@ -532,6 +577,18 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
 
         jLabel6.setText("© Bnome 2015-All rights reserved");
 
+        userNameLabel.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
+        userNameLabel.setForeground(new java.awt.Color(255, 51, 51));
+        userNameLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        userNameLabel.setText("                   ");
+        userNameLabel.setMaximumSize(new java.awt.Dimension(100, 16));
+        userNameLabel.setMinimumSize(new java.awt.Dimension(100, 16));
+        userNameLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                userNameLabelMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -556,10 +613,12 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
                         .addComponent(jLabelLink, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(26, 26, 26)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(userNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tareButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(settingsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(orientationPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(orientationPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -570,10 +629,12 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(tareButton)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tareButton)
+                        .addGap(4, 4, 4)
                         .addComponent(settingsButton))
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -585,7 +646,8 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabelLink)
-                    .addComponent(jLabel6))
+                    .addComponent(jLabel6)
+                    .addComponent(userNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -599,28 +661,75 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
     private void settingsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsButtonActionPerformed
         settingsDialog.setLocationRelativeTo(null);
         settingsDialog.setVisible(true);
+
     }//GEN-LAST:event_settingsButtonActionPerformed
 
     private void jLabelLinkMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelLinkMouseClicked
         if (evt.getClickCount() > 0) {
-            if (isDesktopSupported()) {
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
                 try {
                     URI uri = new URI("http://www.vectionvr.com");
-                    getDesktop().browse(uri);
+                    desktop.browse(uri);
                 } catch (IOException ex) {
+                    // do nothing
                 } catch (URISyntaxException ex) {
+                    //do nothing
                 }
             } else {
+                //do nothing
             }
         }
     }//GEN-LAST:event_jLabelLinkMouseClicked
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        setUserName();
     }//GEN-LAST:event_formWindowOpened
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         stopSending();
     }//GEN-LAST:event_formWindowClosing
+
+    private void userNameLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_userNameLabelMouseClicked
+        if(!(evt.isAltDown() && evt.isShiftDown())){
+            if (userNameLabel.getText().length() > 3) {
+                addLicenseFile();
+            } else {
+                showLicenseInformation();
+            }
+        }else{
+            resetLicenseInformation();
+        }
+    }//GEN-LAST:event_userNameLabelMouseClicked
+
+    private void showLicenseInformation() {
+        invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                showMessageDialog(
+                        MainFrame.this,
+                        "Licensed to: " + getLicenseManager().getUserName(),
+                        "License information",
+                        JOptionPane.PLAIN_MESSAGE);
+            }
+        });
+    }
+
+    private void addLicenseFile() throws HeadlessException {
+        JFileChooser fileopen = new JFileChooser();
+        FileFilter filter = new FileNameExtensionFilter("Key files", "pgp");
+        fileopen.setAcceptAllFileFilterUsed(false);
+        fileopen.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileopen.setFileFilter(filter);
+        
+        int ret = fileopen.showDialog(null, "Choose license file");
+        
+        if (ret == JFileChooser.APPROVE_OPTION) {
+            File file = fileopen.getSelectedFile();
+            settingsManager.storeValue("KEY_FILE", file.getAbsolutePath());
+            setUserName();
+        }
+    }
 
     private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jButton1ActionPerformed
         if (running) {
@@ -648,6 +757,8 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
         }
         tareButton.setEnabled(running);
         refreshPortsButton.setEnabled(!running);
+        calibrateButton.setEnabled(!running);
+        gyroButton.setEnabled(!running);
         settingsButton.setEnabled(!running);
         setComponentsEnabled(!running);
     }// GEN-LAST:event_jButton1ActionPerformed
@@ -659,10 +770,45 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
         absMaxZ = 0;
     }// GEN-LAST:event_tareButtonActionPerformed
 
+    private void calibrateButtonActionPerformed(final java.awt.event.ActionEvent evt) {// GEN-FIRST:event_calibrateButtonActionPerformed
+        final CalibrationDataGatheringDialog calibrationDataGatheringDialog = new CalibrationDataGatheringDialog(this, true);
+        calibrationDataGatheringDialog.setLocationRelativeTo(null);
+        calibrationDataGatheringDialog.setPortName(new SerialDeviceAnalyser().getDevicePort());
+        calibrationDataGatheringDialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(final WindowEvent e) {
+                if (calibrationDataGatheringDialog.isCompleted()) {
+                    final CalibrationExecutionDialog calibrationExecutionDialog = new CalibrationExecutionDialog(MainFrame.this, true);
+                    calibrationExecutionDialog.setLocationRelativeTo(null);
+                    calibrationExecutionDialog.setSamples(calibrationDataGatheringDialog.getSamples());
+                    calibrationExecutionDialog.setPortName(getPortName());
+                    calibrationExecutionDialog.setVisible(true);
+                }
+            }
+        });
+        calibrationDataGatheringDialog.setVisible(true);
+    }// GEN-LAST:event_calibrateButtonActionPerformed
+
+    private void gyroButtonActionPerformed(final java.awt.event.ActionEvent evt) {// GEN-FIRST:event_gyroButtonActionPerformed
+        final CalibrationGyroDialog calibrationGyroDialog = new CalibrationGyroDialog(this, true);
+        calibrationGyroDialog.setPortName(new SerialDeviceAnalyser().getDevicePort());
+        calibrationGyroDialog.setLocationRelativeTo(null);
+        calibrationGyroDialog.setVisible(true);
+    }// GEN-LAST:event_gyroButtonActionPerformed
+
+//    private void miButtonActionPerformed(final java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miButtonActionPerformed
+//        final CalibrationMIDialog calibrationMIDialog = new CalibrationMIDialog(this, true);
+//        calibrationMIDialog.setPortName(new SerialDeviceAnalyser().getDevicePort());
+//        calibrationMIDialog.setLocationRelativeTo(null);
+//        calibrationMIDialog.setVisible(true);
+//    }// GEN-LAST:event_miButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton calibrateButton;
     private javax.swing.JLabel delay;
-    private javax.swing.JComboBox deviceChooser;
+    private javax.swing.JLabel deviceLabel;
     private javax.swing.JComboBox direction;
+    private javax.swing.JButton gyroButton;
     private javax.swing.JFormattedTextField hostName;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
@@ -688,6 +834,7 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JCheckBox lockX1;
@@ -706,6 +853,7 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
     private javax.swing.JButton settingsButton;
     private javax.swing.JButton tareButton;
     private javax.swing.JLabel temperature;
+    private javax.swing.JLabel userNameLabel;
     private javax.swing.JLabel xAxisAngle;
     private javax.swing.JLabel yAxisAngle;
     private javax.swing.JLabel zAxisAngle;
@@ -716,21 +864,20 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
             @Override
             public void run() {
                 refreshPortsButton.setEnabled(false);
-                deviceChooser.removeAllItems();
-                deviceChooser.setEnabled(false);
+                deviceLabel.setText("Refreshing ... please wait");
+                deviceLabel.requestFocus();
+                final String devicePort = new SerialDeviceAnalyser().getDevicePort();
                 boolean validPorts = false;
-                final String[] portList = getPortNames();
-                if (isEmpty(portList)) {
-                    deviceChooser.addItem("    -- No device --");
+                if (devicePort == null) {
+                    deviceLabel.setText("No device connected");
                     jButton1.setBackground(null);
                 } else {
+                    deviceLabel.setText(devicePort);
                     validPorts = true;
-                    for (String portName : portList) {
-                        deviceChooser.addItem(portName);
-                    }
                     jButton1.setBackground(Color.GREEN);
-                    deviceChooser.setEnabled(true);
                 }
+                calibrateButton.setEnabled(validPorts);
+                gyroButton.setEnabled(validPorts);
                 jButton1.setEnabled(validPorts);
                 refreshPortsButton.setEnabled(true);
             }
@@ -805,12 +952,14 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
     }
 
     private void setupStreamer() throws NumberFormatException {
-        streamer = new ImuOrientationDataStreamer((String)deviceChooser.getSelectedItem());
+        streamer = new ImuOrientationDataStreamer(new SerialDeviceAnalyser().getDevicePort());
+        streamer.setFilterMode(getFilterMode());
         streamer.setDirectionAxis(direction.getSelectedIndex());
         streamer.setReverseAxis(reverseX.isSelected(), reverseY.isSelected(), reverseZ.isSelected());
         streamer.setAccelerometerRange((byte) settingsDialog.getAccelerometerRange().getSelectedIndex());
         streamer.setCompassRange((byte) settingsDialog.getCompassRange().getSelectedIndex());
         streamer.setGyroscopeRange((byte) settingsDialog.getGyroscopeRange().getSelectedIndex());
+        streamer.setRunningAverage(getRunningAverageValue());
         streamer.setInterval(getInterval());
         streamer.setLockX(lockX1.isSelected());
         streamer.setLockY(lockY1.isSelected());
@@ -818,6 +967,18 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
 
         streamer.registerListener(this);
         new Thread(streamer).start();
+    }
+
+    private FilterMode getFilterMode() {
+        final int selectedIndex = settingsDialog.getFilterModeSelector().getSelectedIndex();
+        if (selectedIndex == 0) {
+            return SLOW;
+        }
+        return FAST;
+    }
+
+    private String getPortName() {
+        return deviceLabel.getText();
     }
 
     @Override
@@ -874,6 +1035,14 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
         jButton1ActionPerformed(null);
     }
 
+    private float getRunningAverageValue() {
+        int selIdx = settingsDialog.getRunningAverageSelector().getSelectedIndex();
+        if (selIdx == 0) {
+            return selIdx;
+        }
+        return (selIdx - 1) * .2f;
+    }
+
     private int getInterval() {
         return parseInt(settingsDialog.getIntervalInput().getText());
     }
@@ -889,6 +1058,25 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
             if (abs(lastSensorData.getEulerAngle().getzAxis()) > absMaxZ) {
                 absMaxZ = abs(lastSensorData.getEulerAngle().getzAxis());
             }
+        }
+    }
+
+    private void setUserName() {
+        if (getLicenseManager().init(settingsManager.getValue("KEY_FILE")).isValid()) {
+            userNameLabel.setText("   ");
+        } else {
+            userNameLabel.setText("-- Please register --");
+            settingsManager.deleteValue("KEY_FILE");
+            showError("<html><body>Unable to load license file."
+                    + "<br/>Please go to our website to register <br/>your copy of "
+                    + "this application.</body></html>");
+        }
+    }
+
+    private void resetLicenseInformation() {
+        if(JOptionPane.showConfirmDialog(MainFrame.this, "Delete license ?", "Please confirm",OK_CANCEL_OPTION)==OK_OPTION){
+            settingsManager.deleteValue("KEY_FILE");
+            setUserName();
         }
     }
 }

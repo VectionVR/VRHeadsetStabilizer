@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2014 Bnome SPRL (info@bnome.be)
+
+    This file is part of VectionVR Stabilizer library.
+
+    VectionVR Stabilizer library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    VectionVR Stabilizer library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with VectionVR Stabilizer library.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -8,6 +28,7 @@
     </parent>
     <artifactId>stabilizer_lib</artifactId>
     <packaging>jar</packaging>
+    <name>VectionVR Stabilizer library</name>
     <dependencies>
         <dependency>
             <groupId>org.scream3r</groupId>
@@ -23,4 +44,16 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <header>${basedir}/../HEADER</header>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

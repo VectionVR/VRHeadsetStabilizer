@@ -1,4 +1,4 @@
-######*Copyright (c) 2015 Nicolas Chalon, Jérôme Hordies info@bnome.be*
+######*Copyright (c) 2014 Bnome SPRL info@bnome.be*
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

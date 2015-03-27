@@ -32,10 +32,6 @@
     <name>VectionVR Stabilizer</name>
     <dependencies>
         <dependency>
-            <groupId>org.python</groupId>
-            <artifactId>jython-standalone</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.vectionvr</groupId>
             <artifactId>stabilizer_lib</artifactId>
             <version>${project.version}</version>
@@ -79,19 +75,9 @@
             <id>assembly</id>
             <dependencies>
                 <dependency>
-                    <groupId>com.vectionvr</groupId>
-                    <artifactId>stabilizer_lib</artifactId>
-                    <version>${project.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
                     <groupId>org.scream3r</groupId>
                     <artifactId>jssc</artifactId>
                 </dependency>
-                <dependency>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcpg-jdk15on</artifactId>
-                </dependency>                
                 <dependency>
                     <groupId>commons-codec</groupId>
                     <artifactId>commons-codec</artifactId>
@@ -107,9 +93,6 @@
                             <execution> 
                                 <id>java7</id> 
                                 <configuration> 
-                                    <excludes> 
-                                        <exclude>com.vectionvr:stabilizer_lib</exclude> 
-                                    </excludes> 
                                     <destDir>${basedir}/target/mac</destDir> 
                                     <name>VectionVR</name> 
                                     <mainClass>com.vectionvr.jort.gui.GuiMain</mainClass> 
@@ -125,9 +108,6 @@
                             <execution> 
                                 <id>java6</id> 
                                 <configuration> 
-                                    <excludes> 
-                                        <exclude>com.vectionvr:stabilizer_lib</exclude> 
-                                    </excludes> 
                                     <destDir>${basedir}/target/mac-legacy</destDir> 
                                     <name>VectionVR</name> 
                                     <mainClass>com.vectionvr.jort.gui.GuiMain</mainClass> 

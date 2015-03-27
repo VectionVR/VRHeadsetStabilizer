@@ -1,24 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (C) 2014 Bnome SPRL (info@bnome.be)
-
-    This file is part of VectionVR Stabilizer.
-
-    VectionVR Stabilizer is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    VectionVR Stabilizer is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with VectionVR Stabilizer.  If not, see <http://www.gnu.org/licenses/>.
-
--->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -29,7 +9,6 @@
     </parent>
     <artifactId>stabilizer_gui</artifactId>
     <packaging>jar</packaging>
-    <name>VectionVR Stabilizer</name>
     <dependencies>
         <dependency>
             <groupId>org.python</groupId>
@@ -51,14 +30,6 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <header>${basedir}/../HEADER</header>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -244,17 +215,17 @@
                                     <dontWrapJar>true</dontWrapJar>
                                     <outfile>target/assembly/VectionVR.exe</outfile>
                                     <downloadUrl>http://java.com/download</downloadUrl>
-                                     									<chdir>../libs/</chdir> -->
+                                    <!-- 									<chdir>../libs/</chdir> -->
                                     <classPath>
                                         <jarLocation>libs</jarLocation>
-                                         										<preCp>libs</preCp> -->
+                                        <!-- 										<preCp>libs</preCp> -->
                                         <addDependencies>true</addDependencies>
                                         <mainClass>com.vectionvr.jort.gui.GuiMain</mainClass>
                                     </classPath>
                                     <icon>src/main/resources/datas/vectionok.ico</icon>
                                     <jre>
                                         <minVersion>1.6.0</minVersion>
-                                         <jdkPreference>preferJdk</jdkPreference> -->
+                                        <!-- <jdkPreference>preferJdk</jdkPreference> -->
                                         <initialHeapSize>64</initialHeapSize>
                                         <maxHeapSize>64</maxHeapSize>
                                     </jre>

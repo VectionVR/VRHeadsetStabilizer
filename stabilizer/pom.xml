@@ -1,24 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (C) 2014 Bnome SPRL (info@bnome.be)
-
-    This file is part of VectionVR Stabilizer.
-
-    VectionVR Stabilizer is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    VectionVR Stabilizer is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with VectionVR Stabilizer.  If not, see <http://www.gnu.org/licenses/>.
-
--->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -26,8 +6,6 @@
     <artifactId>stabilizer</artifactId>
     <version>1.8-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <inceptionYear>2014</inceptionYear>
-    <name>VectionVR Stabilizer</name>
     <modules>
         <module>stabilizer_gui</module>
         <module>stabilizer_lib</module>
@@ -191,6 +169,7 @@
                 <artifactId>bcpg-jdk15on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
     <reporting>
@@ -217,36 +196,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.1</version>
-            </plugin>
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <header>${basedir}/HEADER</header>
-                    <properties>
-                        <owner>Bnome SPRL</owner>
-                        <email>info@bnome.be</email>
-                    </properties>
-                    <excludes>
-                        <exclude>**/README.md</exclude>
-                        <exclude>**/README</exclude>
-                        <exclude>**/COPYING</exclude>
-                        <exclude>**/HEADER</exclude>
-                        <exclude>**/nb-configuration.xml</exclude>
-                        <exclude>src/test/resources/**</exclude>
-                        <exclude>src/main/resources/**</exclude>
-                    </excludes>
-                    <skip>true</skip>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
-                        <phase>process-sources</phase>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

@@ -1,2 +1,5 @@
-
 stabilizer/nb-configuration.xml
+stabilizer/*/target/**
+stabilizer/*/.classpath
+stabilizer/*/.project
+stabilizer/*/.settings/**

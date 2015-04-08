@@ -19,11 +19,15 @@
 package com.vectionvr.jort.gui;
 
 import static com.vectionvr.jort.gui.SettingsManager.getSettingsManager;
+import static java.awt.Desktop.getDesktop;
+import static java.awt.Desktop.isDesktopSupported;
 import static java.lang.Integer.parseInt;
 import static java.lang.Math.abs;
 import static java.lang.Math.toDegrees;
 import static java.lang.System.nanoTime;
 import static javax.swing.SwingUtilities.invokeLater;
+import static jssc.SerialPortList.getPortNames;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -52,10 +56,6 @@ import com.vectionvr.jort.net.UDPSender;
 import com.vectionvr.jort.serial.ImuOrientationDataStreamer;
 import com.vectionvr.jort.serial.SensorException;
 import com.vectionvr.jort.serial.StreamingSensorEventListener;
-import static java.awt.Desktop.getDesktop;
-import static java.awt.Desktop.isDesktopSupported;
-import static jssc.SerialPortList.getPortNames;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 /**
  * @author (Nicolas Chalon) n.chalon@bnome.be
@@ -530,7 +530,7 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
             }
         });
 
-        jLabel6.setText("© Bnome 2015-All rights reserved");
+        jLabel6.setText("Provided by Bnome under GPLv3 license");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

@@ -3,3 +3,4 @@ stabilizer/*/target/**
 stabilizer/*/.classpath
 stabilizer/*/.project
 stabilizer/*/.settings/**
+*.project

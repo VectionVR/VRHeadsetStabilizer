@@ -42,7 +42,7 @@
         <commons.lang.version>3.3.2</commons.lang.version>
         <commons.io.version>2.4</commons.io.version>
         <jfreechart.version>1.0.17</jfreechart.version>
-        <jogamp.version>2.1.4</jogamp.version>
+        <jogamp.version>2.2.4</jogamp.version>
         <jython.version>2.5.2</jython.version>
         <junit.version>4.10</junit.version>
         <fest.version>1.4</fest.version>

@@ -19,6 +19,8 @@
 package com.vectionvr.jort.gui;
 
 import static com.vectionvr.jort.gui.SettingsManager.getSettingsManager;
+import static com.vectionvr.jort.jogl.CameraViews.FirstPerson;
+import static java.awt.BorderLayout.CENTER;
 import static java.awt.Desktop.getDesktop;
 import static java.awt.Desktop.isDesktopSupported;
 import static java.lang.Integer.parseInt;
@@ -29,7 +31,6 @@ import static javax.swing.SwingUtilities.invokeLater;
 import static jssc.SerialPortList.getPortNames;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.IOException;
@@ -50,7 +51,6 @@ import javax.swing.JPanel;
 
 import com.jogamp.opengl.util.FPSAnimator;
 import com.vectionvr.jort.data.SensorData;
-import com.vectionvr.jort.jogl.CameraViews;
 import com.vectionvr.jort.jogl.WorldScene;
 import com.vectionvr.jort.net.UDPSender;
 import com.vectionvr.jort.serial.ImuOrientationDataStreamer;
@@ -96,15 +96,14 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
         animator = new FPSAnimator(canvas, 100);
         animator.setIgnoreExceptions(true);
         animator.setPrintExceptions(false);
-        orientationPanel.add(canvas, BorderLayout.CENTER);
+        orientationPanel.add(canvas, CENTER);
         canvas.addGLEventListener(scene);
         scene.setBackgroundColor(new float[]{0f, 0f, 0f, .3f});
-        scene.setCamera(CameraViews.FirstPerson);
+        scene.setCamera(FirstPerson);
         scene.setLineWidth(2f);
         scene.setCubeEnabled(true);
         scene.setGridEnabled(false);
         scene.setCubeSize(10f);
-
     }
 
     /**
@@ -189,13 +188,9 @@ public class MainFrame extends javax.swing.JFrame implements Runnable, Streaming
         });
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Destination"));
-
         jLabel1.setText("Host");
-
         hostName.setText("::1");
-
         port.setText("27015");
-
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel2.setText("Port");
 

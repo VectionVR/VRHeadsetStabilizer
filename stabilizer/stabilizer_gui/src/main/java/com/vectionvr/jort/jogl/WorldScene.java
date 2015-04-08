@@ -18,15 +18,17 @@
  */
 package com.vectionvr.jort.jogl;
 
-import com.jogamp.opengl.math.Quaternion;
-import com.vectionvr.jort.data.SensorData;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.jogamp.opengl.math.Quaternion;
+import com.vectionvr.jort.data.SensorData;
 
 /**
  * @author (Nicolas Chalon) n.chalon@bnome.be
@@ -45,6 +47,7 @@ public class WorldScene implements GLEventListener {
     private final Axis axis = new Axis();
     private final GrayAxis grayAxis = new GrayAxis();
     private float[] backgroundColor = new float[]{0.93f, 0.93f, 0.93f, 1f};
+    private float[] transpositionMatrix = currentRotation.toMatrix(new float[16],0);
     private boolean cubeEnabled = true;
     private boolean gridEnabled;
 
@@ -98,7 +101,7 @@ public class WorldScene implements GLEventListener {
         }else{
             grayAxis.draw(gl);
         }
-        gl.glMultTransposeMatrixf(currentRotation.toMatrix(), 0);
+        gl.glMultTransposeMatrixf(transpositionMatrix, 0);
         if(cubeEnabled){
             cube.draw(gl);
         }
@@ -107,7 +110,7 @@ public class WorldScene implements GLEventListener {
         gl.glPopMatrix();
     }
 
-    @Override
+	@Override
     public void reshape(GLAutoDrawable gLDrawable, int x, int y, int width, int height) {
         final GL2 gl = (GL2) gLDrawable.getGL();
         if (height <= 0) // avoid a divide by zero error!
@@ -134,10 +137,11 @@ public class WorldScene implements GLEventListener {
         currentRotation.setY(data.getQuaternion().getZ());
         currentRotation.setZ(data.getQuaternion().getY());
         currentRotation.normalize();
+        transpositionMatrix = currentRotation.toMatrix(transpositionMatrix,0);
     }
 
     public void update(float[] axis, float angle) {
-        currentRotation.fromAxis(axis, angle);
+        currentRotation.setFromAngleNormalAxis(angle,axis);
         currentRotation.normalize();
     }
 

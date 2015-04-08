@@ -27,5 +27,8 @@ mvn clean install -p assembly
 There is no setup required, when starting the project, the main window should appear immediately.
 ##Improvements / Custom needs
 We know that this software requires a lot of improvement and we will try to keep it up to date. If you want any changes to be done and cannot do it yourself or want any custom development, feel free to [contact-us](mailto:contact@vectionvr.com).
+##Known problems
+#####*Application crashes at startup / I don't see the spinning cube at the bottom of the aplication*
+We noticed a problem with JoGL (the OpenGL java library) that causes the application to crash at startup. To avoid that we disabkle the cube rendering when JoGL is not initialised correctly. This can usually be fixed by updating the graphic card driver (and management software in case of nvidia graphic card)
 ##Disclaimer
 ######*VectionVR is in no way affiliated with YEI or Oculus. All source code or binary library is provided as is. VectionVR, Bnome or any of their representatives can in no way be held liable for any damages caused by using this software.*
